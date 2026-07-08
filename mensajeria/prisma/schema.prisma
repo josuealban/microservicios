@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+enum SubscriptionTier {
+  FREE
+  BRONZE
+  GOLD
+  PREMIUM
+  PLATINUM
+}
+
+model SubscriptionPlan {
+  tier        SubscriptionTier @id
+  name        String
+  description String
+  price       Float
+  features    String[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Chat {
+  id        Int       @id @default(autoincrement())
+  matchId   Int       @unique
+  messages  Message[]
+  createdAt DateTime  @default(now())
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  fromId    Int
+  chatId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  createdAt DateTime @default(now())
+}

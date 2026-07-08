@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  BRONZE
+  GOLD
+  PREMIUM
+  PLATINUM
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  password  String
+  phone     String? @unique
+  name      String
+  age       Int
+  role      Role    @default(USER)
+
+  photos    Photo[]
+  profile   Profile?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio              String?
+  weight           Float?
+  height           Float?
+  nationality      String?
+  gender           Gender?
+  city             String?
+  country          String?
+
+  zodiacSign       String?
+  seeking          String?
+  location         String?
+  job              String?
+  hobbies          String[]
+  musicList        String[]
+
+  spotifyId        String?
+
+  subscription     SubscriptionTier @default(FREE)
+  donationsEnabled Boolean          @default(false)
+
+  isRestricted     Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Photo {
+  id        Int     @id @default(autoincrement())
+  url       String
+  isPrimary Boolean @default(false)
+
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
