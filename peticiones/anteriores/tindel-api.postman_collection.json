@@ -1,0 +1,338 @@
+{
+  "info": {
+    "name": "Tindel API",
+    "description": "ColecciÃ³n completa de endpoints. El flujo estÃ¡ ordenado para encadenar IDs dinÃ¡micamente: crear recursos primero, luego leer/actualizar, luego eliminar en orden correcto.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token",   "value": "", "type": "string" },
+    { "key": "userId",  "value": "", "type": "string" },
+    { "key": "userId2", "value": "", "type": "string" },
+    { "key": "matchId", "value": "", "type": "string" },
+    { "key": "chatId",  "value": "", "type": "string" },
+    { "key": "interactionId", "value": "", "type": "string" },
+    { "key": "messageId",     "value": "", "type": "string" },
+    { "key": "photoId",       "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth","register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test_{{$randomInt}}@example.com\",\n  \"password\": \"secret123\",\n  \"name\": \"Test User\",\n  \"age\": 22,\n  \"gender\": \"MALE\",\n  \"city\": \"Quito\",\n  \"country\": \"Ecuador\",\n  \"subscription\": \"FREE\"\n}" }
+          }
+        },
+        {
+          "name": "Login (guarda token)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.access_token){pm.collectionVariables.set('token',r.access_token);console.log('âœ… Token OK');}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth","login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"admin123\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Setup â€” Crear recursos",
+      "item": [
+        {
+          "name": "Crear usuario secundario (userId2)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.id){pm.collectionVariables.set('userId2',r.id);console.log('âœ… userId2:',r.id);}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"ana_{{$randomInt}}@example.com\",\n  \"password\": \"secret123\",\n  \"name\": \"Ana Lopez\",\n  \"age\": 28,\n  \"gender\": \"FEMALE\",\n  \"city\": \"Guayaquil\",\n  \"country\": \"Ecuador\",\n  \"subscription\": \"FREE\"\n}" }
+          }
+        },
+        {
+          "name": "Mi perfil (guarda userId)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.id){pm.collectionVariables.set('userId',r.id);console.log('âœ… userId:',r.id);}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/users/me", "host": ["{{baseUrl}}"], "path": ["users","me"] }
+          }
+        },
+        {
+          "name": "Crear match (guarda matchId + chatId)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.id){pm.collectionVariables.set('matchId',r.id);if(r.chat)pm.collectionVariables.set('chatId',r.chat.id);console.log('âœ… matchId:',r.id,'chatId:',r.chat?.id);}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/matches", "host": ["{{baseUrl}}"], "path": ["matches"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user1Id\": {{userId}},\n  \"user2Id\": {{userId2}}\n}" }
+          }
+        },
+        {
+          "name": "Crear interacciÃ³n LIKE (guarda interactionId)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.id){pm.collectionVariables.set('interactionId',r.id);console.log('âœ… interactionId:',r.id);}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/interactions", "host": ["{{baseUrl}}"], "path": ["interactions"] },
+            "body": { "mode": "raw", "raw": "{\n  \"fromId\": {{userId}},\n  \"toId\": {{userId2}},\n  \"type\": \"LIKE\"\n}" }
+          }
+        },
+        {
+          "name": "Enviar mensaje (guarda messageId)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.id){pm.collectionVariables.set('messageId',r.id);console.log('âœ… messageId:',r.id);}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/messages", "host": ["{{baseUrl}}"], "path": ["messages"] },
+            "body": { "mode": "raw", "raw": "{\n  \"chatId\": {{chatId}},\n  \"fromId\": {{userId}},\n  \"content\": \"Hola, Â¿cÃ³mo estÃ¡s?\"\n}" }
+          }
+        },
+        {
+          "name": "Subir foto (guarda photoId)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r=pm.response.json();if(r.id){pm.collectionVariables.set('photoId',r.id);console.log('âœ… photoId:',r.id);}"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/photos", "host": ["{{baseUrl}}"], "path": ["photos"] },
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": {{userId}},\n  \"url\": \"https://images.unsplash.com/photo-new\",\n  \"isPrimary\": false\n}" }
+          }
+        },
+        {
+          "name": "Eliminar suscripciÃ³n PLATINUM (para poder recrearla)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/subscriptions/PLATINUM", "host": ["{{baseUrl}}"], "path": ["subscriptions","PLATINUM"] }
+          }
+        },
+        {
+          "name": "Crear suscripciÃ³n PLATINUM [ADMIN]",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/subscriptions", "host": ["{{baseUrl}}"], "path": ["subscriptions"] },
+            "body": { "mode": "raw", "raw": "{\n  \"tier\": \"PLATINUM\",\n  \"name\": \"Platino\",\n  \"description\": \"Plan platino\",\n  \"price\": 39.99,\n  \"features\": [\"Todas las funciones de Premium\", \"Prioridad en likes\"]\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Users â€” Leer y actualizar",
+      "item": [
+        {
+          "name": "Obtener todos los usuarios [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] } }
+        },
+        {
+          "name": "EstadÃ­sticas por paÃ­s [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users/stats/by-country", "host": ["{{baseUrl}}"], "path": ["users","stats","by-country"] } }
+        },
+        {
+          "name": "Buscar usuarios (bÃºsqueda derivada)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users/search/derived?minAge=18&maxAge=35&country=Ecuador", "host": ["{{baseUrl}}"], "path": ["users","search","derived"], "query": [{"key":"minAge","value":"18"},{"key":"maxAge","value":"35"},{"key":"country","value":"Ecuador"}] } }
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users","{{userId}}"] } }
+        },
+        {
+          "name": "Actualizar usuario (PATCH)",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users","{{userId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"bio\": \"Actualizado via PATCH\"\n}" } }
+        },
+        {
+          "name": "Actualizar usuario (PUT)",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users","{{userId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"bio\": \"Actualizado via PUT\",\n  \"city\": \"Madrid\"\n}" } }
+        }
+      ]
+    },
+    {
+      "name": "4. Matches â€” Leer y actualizar",
+      "item": [
+        {
+          "name": "Obtener todos los matches [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/matches", "host": ["{{baseUrl}}"], "path": ["matches"] } }
+        },
+        {
+          "name": "Obtener match por ID",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches","{{matchId}}"] } }
+        },
+        {
+          "name": "Matches de un usuario",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/matches/user/{{userId}}", "host": ["{{baseUrl}}"], "path": ["matches","user","{{userId}}"] } }
+        },
+        {
+          "name": "Actualizar match (PATCH)",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches","{{matchId}}"] }, "body": { "mode": "raw", "raw": "{}" } }
+        },
+        {
+          "name": "Actualizar match (PUT)",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches","{{matchId}}"] }, "body": { "mode": "raw", "raw": "{}" } }
+        }
+      ]
+    },
+    {
+      "name": "5. Interactions â€” Leer y actualizar",
+      "item": [
+        {
+          "name": "Obtener todas las interacciones [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/interactions", "host": ["{{baseUrl}}"], "path": ["interactions"] } }
+        },
+        {
+          "name": "Obtener interacciÃ³n por ID",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/interactions/{{interactionId}}", "host": ["{{baseUrl}}"], "path": ["interactions","{{interactionId}}"] } }
+        },
+        {
+          "name": "Interacciones de un usuario",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/interactions/user/{{userId}}", "host": ["{{baseUrl}}"], "path": ["interactions","user","{{userId}}"] } }
+        },
+        {
+          "name": "Actualizar interacciÃ³n (PATCH)",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/interactions/{{interactionId}}", "host": ["{{baseUrl}}"], "path": ["interactions","{{interactionId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"type\": \"SUPERLIKE\"\n}" } }
+        },
+        {
+          "name": "Actualizar interacciÃ³n (PUT)",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/interactions/{{interactionId}}", "host": ["{{baseUrl}}"], "path": ["interactions","{{interactionId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"type\": \"REPORT\"\n}" } }
+        }
+      ]
+    },
+    {
+      "name": "6. Chats â€” Leer y actualizar",
+      "item": [
+        {
+          "name": "Obtener todos los chats [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/chats", "host": ["{{baseUrl}}"], "path": ["chats"] } }
+        },
+        {
+          "name": "Obtener chat por ID",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/chats/{{chatId}}", "host": ["{{baseUrl}}"], "path": ["chats","{{chatId}}"] } }
+        },
+        {
+          "name": "Actualizar chat (PATCH)",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/chats/{{chatId}}", "host": ["{{baseUrl}}"], "path": ["chats","{{chatId}}"] }, "body": { "mode": "raw", "raw": "{}" } }
+        },
+        {
+          "name": "Actualizar chat (PUT)",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/chats/{{chatId}}", "host": ["{{baseUrl}}"], "path": ["chats","{{chatId}}"] }, "body": { "mode": "raw", "raw": "{}" } }
+        }
+      ]
+    },
+    {
+      "name": "7. Messages â€” Leer y actualizar",
+      "item": [
+        {
+          "name": "Obtener todos los mensajes [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/messages", "host": ["{{baseUrl}}"], "path": ["messages"] } }
+        },
+        {
+          "name": "Obtener mensaje por ID",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/messages/{{messageId}}", "host": ["{{baseUrl}}"], "path": ["messages","{{messageId}}"] } }
+        },
+        {
+          "name": "Mensajes de un chat",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/messages/chat/{{chatId}}", "host": ["{{baseUrl}}"], "path": ["messages","chat","{{chatId}}"] } }
+        },
+        {
+          "name": "Actualizar mensaje (PATCH)",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/messages/{{messageId}}", "host": ["{{baseUrl}}"], "path": ["messages","{{messageId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"content\": \"Actualizado via PATCH\"\n}" } }
+        },
+        {
+          "name": "Actualizar mensaje (PUT)",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/messages/{{messageId}}", "host": ["{{baseUrl}}"], "path": ["messages","{{messageId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"content\": \"Actualizado via PUT\"\n}" } }
+        }
+      ]
+    },
+    {
+      "name": "8. Photos â€” Leer y actualizar",
+      "item": [
+        {
+          "name": "Obtener todas las fotos [ADMIN]",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/photos", "host": ["{{baseUrl}}"], "path": ["photos"] } }
+        },
+        {
+          "name": "Obtener foto por ID",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/photos/{{photoId}}", "host": ["{{baseUrl}}"], "path": ["photos","{{photoId}}"] } }
+        },
+        {
+          "name": "Fotos de un usuario",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/photos/user/{{userId}}", "host": ["{{baseUrl}}"], "path": ["photos","user","{{userId}}"] } }
+        },
+        {
+          "name": "Actualizar foto (PATCH)",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/photos/{{photoId}}", "host": ["{{baseUrl}}"], "path": ["photos","{{photoId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"isPrimary\": true\n}" } }
+        },
+        {
+          "name": "Actualizar foto (PUT)",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/photos/{{photoId}}", "host": ["{{baseUrl}}"], "path": ["photos","{{photoId}}"] }, "body": { "mode": "raw", "raw": "{\n  \"url\": \"https://images.unsplash.com/photo-updated\",\n  \"isPrimary\": true\n}" } }
+        }
+      ]
+    },
+    {
+      "name": "9. Subscriptions â€” CRUD",
+      "item": [
+        {
+          "name": "Obtener todas las suscripciones",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions", "host": ["{{baseUrl}}"], "path": ["subscriptions"] } }
+        },
+        {
+          "name": "Obtener suscripciÃ³n FREE",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/FREE", "host": ["{{baseUrl}}"], "path": ["subscriptions","FREE"] } }
+        },
+        {
+          "name": "Obtener suscripciÃ³n BRONZE",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/BRONZE", "host": ["{{baseUrl}}"], "path": ["subscriptions","BRONZE"] } }
+        },
+        {
+          "name": "Obtener suscripciÃ³n GOLD",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/GOLD", "host": ["{{baseUrl}}"], "path": ["subscriptions","GOLD"] } }
+        },
+        {
+          "name": "Obtener suscripciÃ³n PREMIUM",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/PREMIUM", "host": ["{{baseUrl}}"], "path": ["subscriptions","PREMIUM"] } }
+        },
+        {
+          "name": "Obtener suscripciÃ³n PLATINUM",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/PLATINUM", "host": ["{{baseUrl}}"], "path": ["subscriptions","PLATINUM"] } }
+        },
+        {
+          "name": "Actualizar suscripciÃ³n GOLD (PATCH) [ADMIN]",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/GOLD", "host": ["{{baseUrl}}"], "path": ["subscriptions","GOLD"] }, "body": { "mode": "raw", "raw": "{\n  \"price\": 11.99,\n  \"description\": \"Plan Oro mejorado\"\n}" } }
+        },
+        {
+          "name": "Actualizar suscripciÃ³n GOLD (PUT) [ADMIN]",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" },{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/subscriptions/GOLD", "host": ["{{baseUrl}}"], "path": ["subscriptions","GOLD"] }, "body": { "mode": "raw", "raw": "{\n  \"name\": \"Oro Plus\",\n  \"price\": 12.99,\n  \"description\": \"Plan Oro Plus\",\n  \"features\": [\"Todo incluido\"]\n}" } }
+        }
+      ]
+    },
+    {
+      "name": "10. Cleanup â€” Eliminar en orden correcto",
+      "item": [
+        {
+          "name": "Eliminar mensaje",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/messages/{{messageId}}", "host": ["{{baseUrl}}"], "path": ["messages","{{messageId}}"] } }
+        },
+        {
+          "name": "Eliminar interacciÃ³n",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/interactions/{{interactionId}}", "host": ["{{baseUrl}}"], "path": ["interactions","{{interactionId}}"] } }
+        },
+        {
+          "name": "Eliminar foto",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/photos/{{photoId}}", "host": ["{{baseUrl}}"], "path": ["photos","{{photoId}}"] } }
+        },
+        {
+          "name": "Eliminar match (borra chat+mensajes automÃ¡ticamente) [ADMIN]",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/matches/{{matchId}}", "host": ["{{baseUrl}}"], "path": ["matches","{{matchId}}"] } }
+        },
+        {
+          "name": "Eliminar usuario secundario [ADMIN]",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/users/{{userId2}}", "host": ["{{baseUrl}}"], "path": ["users","{{userId2}}"] } }
+        }
+      ]
+    }
+  ]
+}
+

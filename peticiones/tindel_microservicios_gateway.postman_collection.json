@@ -1,0 +1,1072 @@
+{
+	"info": {
+		"_postman_id": "b3e34b5c-4c02-4d24-8b63-0a95f9c4f420",
+		"name": "tindel_microservicios_gateway",
+		"description": "Colección oficial para probar el API Gateway de Tindel. Todas las peticiones van a http://localhost:3000. Sigue el orden de las carpetas para probar correctamente.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Auth y Usuarios",
+			"item": [
+				{
+					"name": "POST /users (Usuario 1 - Alice)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var ts = Date.now();",
+									"pm.collectionVariables.set('aliceEmail', 'alice' + ts + '@tindel.com');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('userId', jsonData.id);",
+									"    console.log('userId (Alice) guardado: ' + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{aliceEmail}}\",\n    \"password\": \"123456\",\n    \"name\": \"Alice\",\n    \"age\": 24,\n    \"bio\": \"Amo la musica y los viajes\",\n    \"gender\": \"FEMALE\",\n    \"nationality\": \"Ecuador\",\n    \"city\": \"Quito\",\n    \"country\": \"Ecuador\",\n    \"hobbies\": [\"musica\", \"viajes\"],\n    \"musicList\": [\"Rock\", \"Pop\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /users (Usuario 2 - Bob)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var ts = Date.now();",
+									"pm.collectionVariables.set('bobEmail', 'bob' + ts + '@tindel.com');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('targetUserId', jsonData.id);",
+									"    console.log('targetUserId (Bob) guardado: ' + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{bobEmail}}\",\n    \"password\": \"123456\",\n    \"name\": \"Bob\",\n    \"age\": 27,\n    \"bio\": \"Fan del deporte y la tecnologia\",\n    \"gender\": \"MALE\",\n    \"nationality\": \"Ecuador\",\n    \"city\": \"Guayaquil\",\n    \"country\": \"Ecuador\",\n    \"hobbies\": [\"deporte\", \"tecnologia\"],\n    \"musicList\": [\"Electronica\", \"Jazz\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /auth/login (Alice - Usuario 1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"    console.log(\"Token guardado automaticamente: \" + jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{aliceEmail}}\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /auth/login (Bob - Usuario 2)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"    console.log(\"Token de Bob guardado: \" + jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{bobEmail}}\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /users/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /users/:id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Alice Actualizada\",\n    \"bio\": \"Perfil actualizado con PATCH\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /users/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{aliceEmail}}\",\n    \"password\": \"123456\",\n    \"name\": \"Alice Completa\",\n    \"age\": 25,\n    \"bio\": \"Perfil reemplazado con PUT\",\n    \"gender\": \"FEMALE\",\n    \"nationality\": \"Ecuador\",\n    \"city\": \"Quito\",\n    \"country\": \"Ecuador\",\n    \"hobbies\": [\"musica\", \"viajes\", \"lectura\"],\n    \"musicList\": [\"Rock\", \"Pop\", \"Jazz\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /users/:id (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Photos",
+			"item": [
+				{
+					"name": "POST /photos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('photoId', jsonData.id);",
+									"    console.log('photoId guardado: ' + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{userId}},\n    \"url\": \"https://randomuser.me/api/portraits/women/44.jpg\",\n    \"isPrimary\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/photos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"photos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /photos/user/:userId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/photos/user/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"photos",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /photos/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"url\": \"https://randomuser.me/api/portraits/women/50.jpg\",\n    \"isPrimary\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/photos/{{photoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"photos",
+								"{{photoId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /photos/:id (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/photos/{{photoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"photos",
+								"{{photoId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Interactions y Matches",
+			"description": "IMPORTANTE: Para generar un Match necesitas 2 usuarios. Paso 1: Alice (userId=1) le da LIKE a Bob (targetUserId=2). Paso 2: Loguéate como Bob, actualiza el token. Paso 3: Bob (userId=2) le da LIKE a Alice (fromId=2, toId=1). El sistema generará automáticamente un Match.",
+			"item": [
+				{
+					"name": "POST /interactions (Alice LIKE a Bob)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"LIKE\",\n    \"fromId\": {{userId}},\n    \"toId\": {{targetUserId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/interactions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"interactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /interactions (Bob LIKE a Alice - Genera MATCH)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"LIKE\",\n    \"fromId\": {{targetUserId}},\n    \"toId\": {{userId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/interactions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"interactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /interactions/user/:userId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/interactions/user/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"interactions",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /interactions/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"SUPERLIKE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/interactions/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"interactions",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /matches/user/:userId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (Array.isArray(jsonData) && jsonData.length > 0 && jsonData[0].id) {",
+									"    pm.collectionVariables.set('matchId', jsonData[0].id);",
+									"    console.log('matchId guardado: ' + jsonData[0].id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/matches/user/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"matches",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /matches/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/matches/{{matchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"matches",
+								"{{matchId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /matches/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user1Id\": {{userId}},\n    \"user2Id\": {{targetUserId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/matches/{{matchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"matches",
+								"{{matchId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Chats y Messages",
+			"description": "Para probar chats necesitas un matchId válido (creado en el paso de Interactions). Primero crea el chat con el matchId, luego envía mensajes.",
+			"item": [
+				{
+					"name": "POST /chats",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('chatId', jsonData.id);",
+									"    console.log('chatId guardado: ' + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"matchId\": {{matchId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /chats/:id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chats/{{chatId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chats",
+								"{{chatId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /chats/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"matchId\": {{matchId}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chats/{{chatId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chats",
+								"{{chatId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /messages",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData && jsonData.id) {",
+									"    pm.collectionVariables.set('messageId', jsonData.id);",
+									"    console.log('messageId guardado: ' + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"chatId\": {{chatId}},\n    \"fromId\": {{userId}},\n    \"content\": \"Hola! Acabo de hacer match contigo!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /messages (Respuesta de Bob)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"chatId\": {{chatId}},\n    \"fromId\": {{targetUserId}},\n    \"content\": \"Hola Alice! Que bueno hacer match!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /messages/chat/:chatId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/messages/chat/{{chatId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"chat",
+								"{{chatId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /messages/:id",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Mensaje editado correctamente\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/messages/{{messageId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"{{messageId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /messages/:id (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/messages/{{messageId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"messages",
+								"{{messageId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Subscriptions y Subscription Plans",
+			"description": "Planes de suscripción gestionados por el microservicio de Mensajería. POST/PUT/DELETE requieren rol ADMIN.",
+			"item": [
+				{
+					"name": "GET /subscription-plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/subscription-plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscription-plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /subscription-plans/:tier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/subscription-plans/GOLD",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscription-plans",
+								"GOLD"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /subscription-plans (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tier\": \"GOLD\",\n    \"name\": \"Plan Gold\",\n    \"price\": 9.99,\n    \"durationDays\": 30,\n    \"features\": [\"Perfiles ilimitados\", \"5 superlikes al dia\", \"Ver quien te dio like\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subscription-plans",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscription-plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT /subscription-plans/:tier (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Plan Gold Premium\",\n    \"price\": 12.99,\n    \"durationDays\": 30,\n    \"features\": [\"Perfiles ilimitados\", \"10 superlikes al dia\", \"Boost de perfil\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subscription-plans/GOLD",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscription-plans",
+								"GOLD"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /subscription-plans/:tier (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/subscription-plans/GOLD",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscription-plans",
+								"GOLD"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /subscriptions",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{userId}},\n    \"tier\": \"GOLD\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscriptions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /subscriptions/user/:userId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/user/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscriptions",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string",
+			"description": "ID del Usuario 1 (Alice). Se asigna automáticamente al crear Alice."
+		},
+		{
+			"key": "targetUserId",
+			"value": "",
+			"type": "string",
+			"description": "ID del Usuario 2 (Bob). Se asigna automáticamente al crear Bob."
+		},
+		{
+			"key": "matchId",
+			"value": "",
+			"type": "string",
+			"description": "ID del Match generado tras el LIKE mutuo. Se asigna automáticamente."
+		},
+		{
+			"key": "chatId",
+			"value": "",
+			"type": "string",
+			"description": "ID del Chat creado en POST /chats. Se asigna automáticamente."
+		},
+		{
+			"key": "photoId",
+			"value": "",
+			"type": "string",
+			"description": "ID de la foto creada en POST /photos. Se asigna automáticamente."
+		},
+		{
+			"key": "messageId",
+			"value": "",
+			"type": "string",
+			"description": "ID del mensaje creado. Se asigna automáticamente."
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string",
+			"description": "JWT Token. Se guarda automaticamente al ejecutar POST /auth/login"
+		},
+		{
+			"key": "aliceEmail",
+			"value": "alice@tindel.com",
+			"type": "string",
+			"description": "Email de Alice generado dinamicamente. Se actualiza en el prerequest script."
+		},
+		{
+			"key": "bobEmail",
+			"value": "bob@tindel.com",
+			"type": "string",
+			"description": "Email de Bob generado dinamicamente. Se actualiza en el prerequest script."
+		}
+	]
+}
