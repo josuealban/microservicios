@@ -1,12 +1,19 @@
-﻿# Separación de Servicios
+# Separación de Servicios
 
 Este repositorio contiene la arquitectura de microservicios separada para la aplicación.
 
+## Características y Arquitectura
+- **Proyectos Independientes**: Cada carpeta es un proyecto NestJS independiente con su propio `package.json`, `.env` y configuración.
+- **Configuración Global**: Se utiliza `@nestjs/config` (`ConfigModule.forRoot`) de forma global en todos los proyectos.
+- **Validación Global**: Se utiliza `ValidationPipe` de forma global en todos los proyectos.
+- **Microservicios Aislados**: Cada microservicio tiene su propia base de datos, su propio cliente Prisma y gestiona sus datos de forma aislada (sin relaciones cruzadas).
+- **Gateway sin BD**: El `gateway` actúa únicamente como enrutador HTTP a TCP y **NO usa Prisma** ni tiene base de datos.
+
 ## Servicios
 1. **Gateway** (Puerto 3000): API HTTP pública que enruta peticiones hacia los microservicios usando TCP. No usa Prisma.
-2. **Usuarios** (Puerto 3001): Microservicio TCP para usuarios y perfiles. Usa Prisma con la base de datos usuarios_db.
-3. **Matches** (Puerto 3002): Microservicio TCP para interacciones y matches. Usa Prisma con la base de datos matches_db.
-4. **Mensajeria** (Puerto 3003): Microservicio TCP para chats, mensajes y planes. Usa Prisma con la base de datos mensajeria_db.
+2. **Usuarios** (Puerto 3001): Microservicio TCP para usuarios y perfiles. Usa Prisma con la base de datos `usuarios_db`.
+3. **Matches** (Puerto 3002): Microservicio TCP para interacciones y matches. Usa Prisma con la base de datos `matches_db`.
+4. **Mensajeria** (Puerto 3003): Microservicio TCP para chats, mensajes y planes. Usa Prisma con la base de datos `mensajeria_db`.
 
 ## Instalación
 Cada microservicio funciona independientemente. Para instalarlos:

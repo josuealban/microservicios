@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import { USER_PATTERNS } from '../common/patterns';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -18,7 +18,10 @@ export class AuthController {
   async login(@Payload() data: LoginDto) {
     const user = await this.authService.validateUser(data.email, data.password);
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new RpcException({
+        statusCode: 401,
+        message: 'Credenciales inválidas',
+      });
     }
     return this.authService.login(user);
   }
